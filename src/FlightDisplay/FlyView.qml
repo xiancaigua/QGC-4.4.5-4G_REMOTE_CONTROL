@@ -175,4 +175,20 @@ Item {
         show:                   !QGroundControl.videoManager.fullScreen &&
                                     (videoControl.pipState.state === videoControl.pipState.pipState || mapControl.pipState.state === mapControl.pipState.pipState)
     }
+
+    MouseArea {
+        anchors.fill: parent
+        z: QGroundControl.zOrderTopMost + 1
+        enabled: keyboardJoystickPanel.controlEnabled
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onPressed: {
+            keyboardJoystickPanel.stopControl()
+            mouse.accepted = false
+        }
+    }
+
+    KeyboardJoystickPanel {
+        id: keyboardJoystickPanel
+        parent: _root
+    }
 }
