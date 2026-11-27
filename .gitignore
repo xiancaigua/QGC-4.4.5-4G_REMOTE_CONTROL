@@ -91,3 +91,7 @@ Qt*-linux*.tar.*
 node_modules/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+
+# Local Python MAVLink test output (may contain telemetry)
+tools/__pycache__/
+tools/mavlink_control_mock_capture.jsonl

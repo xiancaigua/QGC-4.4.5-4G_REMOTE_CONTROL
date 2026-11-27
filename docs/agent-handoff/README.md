@@ -1,5 +1,7 @@
 # QGC 4.4.5 键盘模拟遥控器
 
+2026-11-26 的 PX4 1.16.0 4G 控制源、失联状态与载荷面板开发见 [新阶段交接](REMOTE_CONTROL_2026_11_26.md) 和 [测试报告](../4G_REMOTE_CONTROL_TEST_REPORT.md)。以下内容记录原键盘功能阶段，分支与测试结论不能直接代表新阶段。
+
 ## 交付位置
 
 - 完整源码：`D:\ROS2Android\QGC_modification\QGC4.4`，分支 `feature/keyboard-joystick`，基于官方 `v4.4.5`。

@@ -16,6 +16,8 @@ FocusScope {
     property real sensitivity: 0.6
     property real throttleRate: 0.35 // Full throttle travel per second
     property real throttle: 0
+    // Updated only after a MANUAL_CONTROL sample has been handed to Vehicle.
+    property double lastSentMs: 0
     property real requestedX: parent.width - width - 20
     property real requestedY: ScreenTools.defaultFontPixelHeight * 5
     property bool keyW: false
@@ -29,7 +31,8 @@ FocusScope {
     readonly property bool touchJoystickEnabled: QGroundControl.settingsManager.appSettings.virtualJoystick.rawValue
     readonly property bool windowActive: !!Window.window && Window.window.active
     readonly property bool canControl: !!vehicle && !vehicle.joystickEnabled &&
-                                       !vehicle.vehicleLinkManager.communicationLost && !touchJoystickEnabled
+                                       !vehicle.vehicleLinkManager.communicationLost &&
+                                       vehicle.joystickLinkReady() && !touchJoystickEnabled
     readonly property real yaw: ((keyD ? 1 : 0) - (keyA ? 1 : 0)) * sensitivity
     readonly property real roll: ((keyRight ? 1 : 0) - (keyLeft ? 1 : 0)) * sensitivity
     readonly property real pitch: ((keyUp ? 1 : 0) - (keyDown ? 1 : 0)) * sensitivity
@@ -50,6 +53,21 @@ FocusScope {
         controlEnabled = false
         clearKeys()
         throttle = 0
+        lastSentMs = 0
+    }
+
+    function prepareForSourceSwitch() {
+        if (!canControl || !windowActive || !visible) return false
+        controlEnabled = true
+        forceActiveFocus()
+        // Focus delivery is asynchronous after a confirmation dialog closes.
+        // The caller checks streamReady() after the first timer samples.
+        return true
+    }
+
+    function streamReady() {
+        return controlEnabled && activeFocus && canControl && vehicle.joystickLinkReady() && windowActive &&
+               lastSentMs > 0 && Date.now() - lastSentMs < 200
     }
 
     function setKey(key, pressed) {
@@ -95,13 +113,14 @@ FocusScope {
         repeat: true
         running: panel.controlEnabled && panel.activeFocus && panel.windowActive && panel.visible && panel.canControl
         onTriggered: {
-            if (!panel.vehicle || !panel.canControl) {
+            if (!panel.vehicle || !panel.canControl || !panel.vehicle.joystickLinkReady()) {
                 panel.stopControl()
                 return
             }
             var direction = (panel.keyW ? 1 : 0) - (panel.keyS ? 1 : 0)
             panel.throttle = Math.max(0, Math.min(1, panel.throttle + direction * panel.throttleRate * interval / 1000))
             panel.vehicle.virtualTabletJoystickValue(panel.roll, panel.pitch, panel.yaw, panel.throttle)
+            panel.lastSentMs = Date.now()
         }
     }
 

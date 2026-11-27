@@ -14,6 +14,8 @@ add_custom_target(FligthDisplayQml
 		FlyViewPreFlightChecklistPopup.qml
 		FlyView.qml
 		KeyboardJoystickPanel.qml
+		FlightControlSourcePanel.qml
+		PayloadControlPanel.qml
 		FlyViewToolStripActionList.qml
 		FlyViewToolStrip.qml
 		FlyViewVideo.qml

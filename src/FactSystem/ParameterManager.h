@@ -62,7 +62,7 @@ public:
     void refreshAllParameters(uint8_t componentID = MAV_COMP_ID_ALL);
 
     /// Request a refresh on the specific parameter
-    void refreshParameter(int componentId, const QString& paramName);
+    Q_INVOKABLE void refreshParameter(int componentId, const QString& paramName);
 
     /// Request a refresh on all parameters that begin with the specified prefix
     void refreshParametersPrefix(int componentId, const QString& namePrefix);
@@ -73,7 +73,7 @@ public:
     /// Returns true if the specifed parameter exists
     ///     @param componentId: Component id or FactSystem::defaultComponentId
     ///     @param name: Parameter name
-    bool parameterExists(int componentId, const QString& paramName);
+    Q_INVOKABLE bool parameterExists(int componentId, const QString& paramName);
 
     /// Returns all parameter names
     QStringList parameterNames(int componentId);
@@ -82,7 +82,7 @@ public:
     /// a missing parameter error to user if parameter does not exist.
     ///     @param componentId: Component id or FactSystem::defaultComponentId
     ///     @param name: Parameter name
-    Fact* getParameter(int componentId, const QString& paramName);
+    Q_INVOKABLE Fact* getParameter(int componentId, const QString& paramName);
 
     /// Returns error messages from loading
     QString readParametersFromStream(QTextStream& stream);
@@ -97,6 +97,8 @@ public:
     static FactMetaData::ValueType_t    mavTypeToFactType(MAV_PARAM_TYPE mavType);
 
 signals:
+    /// An actual PARAM_VALUE was received from the vehicle (not a local Fact edit).
+    void parameterValueReceived(int componentId, const QString& name, const QVariant& value);
     void parametersReadyChanged     (bool parametersReady);
     void missingParametersChanged   (bool missingParameters);
     void loadProgressChanged        (float value);

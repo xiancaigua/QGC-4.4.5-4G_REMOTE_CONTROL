@@ -1,5 +1,14 @@
 # Agent handoff
 
+## 2026-11-26 development phase
+
+The active local branch is `feature/4g-control-payload`, based on the keyboard branch. It targets PX4 **1.16.0** and adds `FlightControlSourcePanel.qml`, `PayloadControlPanel.qml`, a read-only failsafe check, `Vehicle::sendPayloadActuator()`, and `ParameterManager::parameterValueReceived`. Read `docs/agent-handoff/REMOTE_CONTROL_2026_11_26.md` and `docs/4G_REMOTE_CONTROL_TEST_REPORT.md` before further edits. The user authorized upload of this development branch on 2026-11-27; do not force-push or replace the diverged `main` branch. The Windows Release executable builds and starts, but RC/4G switching, actuator ACK, PX4 SITL, HyperLTE and real RC behavior have **not** passed end-to-end testing. The 2026-11-27 full Debug unit suite failed and crashed; see the test report.
+
+PX4 1.16 `COM_RC_IN_MODE=0/1` permits explicit parameter selection while both inputs are healthy, but mode 1 disables RC. If the 4G connection fails, QGC cannot switch back over the lost link; do not describe the still-connected SBUS receiver as a usable backup in this mode. The panel verifies parameter readback, not PX4's active `manual_control_setpoint.data_source`. The 4G failsafe panel does not modify failsafe parameters or detect HyperLTE-only loss when another GCS heartbeat persists. Current-airframe hardware settings remain unknown. Do not test on a real aircraft before SITL and propeller-free bench validation.
+The source-switch buttons are deliberately limited to the disarmed state until SITL and bench handoff tests are complete.
+
+The older notes below describe the preceding PX4 1.13.3 research and keyboard-only stage; use the new 1.16 documents for this branch.
+
 This is QGroundControl v4.4.5 with the Windows Keyboard Joystick panel on branch `feature/keyboard-joystick`. The panel is in `src/FlightDisplay/KeyboardJoystickPanel.qml` and is mounted from `FlyView.qml`. It sends MAVLink `MANUAL_CONTROL` through the existing Vehicle joystick path, not Offboard velocity commands.
 
 Build and tests: see `docs/agent-handoff/README.md` and `TEST_REPORT.md`. Local Windows build: `D:\ROS2Android\QGC_modification\build-QGC4.4.5\staging\QGroundControl.exe`. The build directory and executable are local, not in Git. Tests used a local fake MAVLink endpoint; no real PX4 1.13.3 / HyperLTE / G20 combined control test has passed.

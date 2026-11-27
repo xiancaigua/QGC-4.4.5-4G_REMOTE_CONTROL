@@ -768,6 +768,11 @@ public:
     /// Same as sendMavCommand but available from Qml.
     Q_INVOKABLE void sendCommand(int compId, int command, bool showError, double param1 = 0.0, double param2 = 0.0, double param3 = 0.0, double param4 = 0.0, double param5 = 0.0, double param6 = 0.0, double param7 = 0.0);
 
+    /// Send one PX4 Actuator Set 1 output. Other outputs are left unchanged using NaN.
+    /// Returns false if the value, link, or command state is not safe to send.
+    Q_INVOKABLE bool sendPayloadActuator(int actuatorNumber, double value);
+    Q_INVOKABLE bool joystickLinkReady() const;
+
     typedef enum {
         MavCmdResultCommandResultOnly,          ///< commandResult specifies full success/fail info
         MavCmdResultFailureNoResponseToCommand, ///< No response from vehicle to command

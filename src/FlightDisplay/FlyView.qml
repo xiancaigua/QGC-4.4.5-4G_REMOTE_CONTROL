@@ -191,4 +191,16 @@ Item {
         id: keyboardJoystickPanel
         parent: _root
     }
+
+    FlightControlSourcePanel {
+        id: flightControlSourcePanel
+        parent: _root
+        keyboardPanel: keyboardJoystickPanel
+    }
+
+    PayloadControlPanel {
+        id: payloadControlPanel
+        parent: _root
+        sourcePanel: flightControlSourcePanel
+    }
 }

@@ -11,6 +11,8 @@
 #include <QDateTime>
 #include <QLocale>
 #include <QQuaternion>
+#include <cmath>
+#include <limits>
 
 #include <Eigen/Eigen>
 
@@ -3055,6 +3057,33 @@ void Vehicle::sendCommand(int compId, int command, bool showError, double param1
                 static_cast<float>(param5),
                 static_cast<float>(param6),
                 static_cast<float>(param7));
+}
+
+bool Vehicle::sendPayloadActuator(int actuatorNumber, double value)
+{
+    if (!px4Firmware() || actuatorNumber < 1 || actuatorNumber > 6 ||
+            !std::isfinite(value) || value < -1.0 || value > 1.0 ||
+            !joystickLinkReady() ||
+            isMavCommandPending(_defaultComponentId, MAV_CMD_DO_SET_ACTUATOR)) {
+        return false;
+    }
+
+    // PX4 v1.16 FunctionActuatorSet accepts group index zero. NaN leaves
+    // every other actuator's previous output untouched.
+    const float ignored = std::numeric_limits<float>::quiet_NaN();
+    float actuators[6] = { ignored, ignored, ignored, ignored, ignored, ignored };
+    actuators[actuatorNumber - 1] = static_cast<float>(value);
+    sendMavCommand(_defaultComponentId, MAV_CMD_DO_SET_ACTUATOR, false,
+                   actuators[0], actuators[1], actuators[2],
+                   actuators[3], actuators[4], actuators[5], 0.0f);
+    return true;
+}
+
+bool Vehicle::joystickLinkReady() const
+{
+    SharedLinkInterfacePtr link = _vehicleLinkManager->primaryLink().lock();
+    return link && !link->linkConfiguration()->isHighLatency() &&
+           !_vehicleLinkManager->communicationLost();
 }
 
 void Vehicle::sendMavCommandWithHandler(const MavCmdAckHandlerInfo_t* ackHandlerInfo, int compId, MAV_CMD command, float param1, float param2, float param3, float param4, float param5, float param6, float param7)

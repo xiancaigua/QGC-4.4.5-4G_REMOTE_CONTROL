@@ -211,6 +211,7 @@ void ParameterManager::mavlinkMessageReceived(mavlink_message_t message)
         }
 
         _handleParamValue(message.compid, parameterName, param_value.param_count, param_value.param_index, static_cast<MAV_PARAM_TYPE>(param_value.param_type), parameterValue);
+        emit parameterValueReceived(message.compid, parameterName, parameterValue);
     }
 }
 
